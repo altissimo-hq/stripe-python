@@ -325,9 +325,7 @@ class StripeClient:
         Args:
             limit: Page size (max 100).
         """
-        return paginate(
-            lambda **kw: self.list_payment_links(**kw), limit=limit
-        )
+        return paginate(lambda **kw: self.list_payment_links(**kw), limit=limit)
 
     # ------------------------------------------------------------------
     # Product operations
@@ -515,9 +513,7 @@ class StripeClient:
             kwargs["code"] = code
         if active is not None:
             kwargs["active"] = active
-        return paginate(
-            lambda **kw: self.list_promotion_codes(**{**kwargs, **kw}), limit=limit
-        )
+        return paginate(lambda **kw: self.list_promotion_codes(**{**kwargs, **kw}), limit=limit)
 
     # ------------------------------------------------------------------
     # Webhook event construction

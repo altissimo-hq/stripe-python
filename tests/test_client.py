@@ -19,6 +19,7 @@ from altissimo.stripe.exceptions import (
 # Helpers / fixtures
 # ---------------------------------------------------------------
 
+
 def _make_mock_stripe_module() -> ModuleType:
     """Return a fake ``stripe`` module with the shapes the client needs."""
     mod = ModuleType("stripe")
@@ -33,27 +34,25 @@ def _make_mock_stripe_module() -> ModuleType:
     # stripe.error hierarchy
     error_ns = SimpleNamespace(
         StripeError=type("StripeError", (Exception,), {}),
-        SignatureVerificationError=type(
-            "SignatureVerificationError", (Exception,), {}
-        ),
+        SignatureVerificationError=type("SignatureVerificationError", (Exception,), {}),
     )
     mod.error = error_ns  # type: ignore[attr-defined]
     return mod
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_stripe():
     """Provide a mock stripe module and patch ``_get_stripe``."""
     return _make_mock_stripe_module()
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_sdk_client():
     """Provide a mock ``stripe.StripeClient`` *instance*."""
     return MagicMock(name="sdk_client")
 
 
-@pytest.fixture()
+@pytest.fixture
 def client(mock_stripe, mock_sdk_client):
     """Return a :class:`StripeClient` with ``_get_stripe`` and ``_get_client`` mocked."""
     sc = StripeClient(api_key="sk_test_xxx", webhook_signing_secret="whsec_test")
@@ -71,6 +70,7 @@ def client(mock_stripe, mock_sdk_client):
 # Factory / env tests
 # ---------------------------------------------------------------
 
+
 class TestFromEnv:
     """Tests for ``StripeClient.from_env``."""
 
@@ -86,9 +86,7 @@ class TestFromEnv:
         assert sc._webhook_signing_secret == "whsec_xyz"
 
     def test_from_env_missing_key(self):
-        with patch.dict(os.environ, {}, clear=True), pytest.raises(
-            ValueError, match="STRIPE_API_KEY"
-        ):
+        with patch.dict(os.environ, {}, clear=True), pytest.raises(ValueError, match="STRIPE_API_KEY"):
             StripeClient.from_env()
 
 
@@ -96,14 +94,13 @@ class TestFromEnv:
 # Lazy import guard
 # ---------------------------------------------------------------
 
+
 class TestLazyImport:
     """Verify that a missing ``stripe`` package raises ``StripeImportError``."""
 
     def test_lazy_import_error(self):
         sc = StripeClient(api_key="sk_test_xxx")
-        with patch.object(
-            StripeClient, "_get_stripe", side_effect=StripeImportError
-        ), pytest.raises(StripeImportError):
+        with patch.object(StripeClient, "_get_stripe", side_effect=StripeImportError), pytest.raises(StripeImportError):
             sc.list_customers()
 
 
@@ -111,8 +108,8 @@ class TestLazyImport:
 # Customer operations
 # ---------------------------------------------------------------
 
-class TestCustomers:
 
+class TestCustomers:
     def test_list_customers(self, client, mock_sdk_client):
         sentinel = object()
         mock_sdk_client.customers.list.return_value = sentinel
@@ -128,9 +125,7 @@ class TestCustomers:
         sentinel = object()
         mock_sdk_client.customers.create.return_value = sentinel
 
-        result = client.create_customer(
-            email="a@b.com", name="Alice", metadata={"k": "v"}
-        )
+        result = client.create_customer(email="a@b.com", name="Alice", metadata={"k": "v"})
 
         mock_sdk_client.customers.create.assert_called_once_with(
             params={"email": "a@b.com", "name": "Alice", "metadata": {"k": "v"}},
@@ -151,8 +146,8 @@ class TestCustomers:
 # Charge operations
 # ---------------------------------------------------------------
 
-class TestCharges:
 
+class TestCharges:
     def test_list_charges(self, client, mock_sdk_client):
         sentinel = object()
         mock_sdk_client.charges.list.return_value = sentinel
@@ -167,15 +162,13 @@ class TestCharges:
 # PaymentIntent operations
 # ---------------------------------------------------------------
 
-class TestPaymentIntents:
 
+class TestPaymentIntents:
     def test_create_payment_intent(self, client, mock_sdk_client):
         sentinel = object()
         mock_sdk_client.payment_intents.create.return_value = sentinel
 
-        result = client.create_payment_intent(
-            5000, "usd", description="Test charge"
-        )
+        result = client.create_payment_intent(5000, "usd", description="Test charge")
 
         mock_sdk_client.payment_intents.create.assert_called_once_with(
             params={"amount": 5000, "currency": "usd", "description": "Test charge"},
@@ -197,9 +190,7 @@ class TestPaymentIntents:
 
         result = client.update_payment_intent("pi_abc", amount=9999)
 
-        mock_sdk_client.payment_intents.update.assert_called_once_with(
-            "pi_abc", params={"amount": 9999}
-        )
+        mock_sdk_client.payment_intents.update.assert_called_once_with("pi_abc", params={"amount": 9999})
         assert result is sentinel
 
     def test_list_payment_intents(self, client, mock_sdk_client):
@@ -216,8 +207,8 @@ class TestPaymentIntents:
 # PaymentLink operations
 # ---------------------------------------------------------------
 
-class TestPaymentLinks:
 
+class TestPaymentLinks:
     def test_list_payment_links(self, client, mock_sdk_client):
         sentinel = object()
         mock_sdk_client.payment_links.list.return_value = sentinel
@@ -232,8 +223,8 @@ class TestPaymentLinks:
 # Product operations
 # ---------------------------------------------------------------
 
-class TestProducts:
 
+class TestProducts:
     def test_list_products(self, client, mock_sdk_client):
         sentinel = object()
         mock_sdk_client.products.list.return_value = sentinel
@@ -248,8 +239,8 @@ class TestProducts:
 # Price operations
 # ---------------------------------------------------------------
 
-class TestPrices:
 
+class TestPrices:
     def test_list_prices(self, client, mock_sdk_client):
         sentinel = object()
         mock_sdk_client.prices.list.return_value = sentinel
@@ -275,8 +266,8 @@ class TestPrices:
 # Coupon operations
 # ---------------------------------------------------------------
 
-class TestCoupons:
 
+class TestCoupons:
     def test_list_coupons(self, client, mock_sdk_client):
         sentinel = object()
         mock_sdk_client.coupons.list.return_value = sentinel
@@ -291,8 +282,8 @@ class TestCoupons:
 # Refund operations
 # ---------------------------------------------------------------
 
-class TestRefunds:
 
+class TestRefunds:
     def test_list_refunds(self, client, mock_sdk_client):
         sentinel = object()
         mock_sdk_client.refunds.list.return_value = sentinel
@@ -307,8 +298,8 @@ class TestRefunds:
 # Promotion Code operations
 # ---------------------------------------------------------------
 
-class TestPromotionCodes:
 
+class TestPromotionCodes:
     def test_retrieve_promotion_code(self, client, mock_sdk_client):
         sentinel = object()
         mock_sdk_client.promotion_codes.retrieve.return_value = sentinel
@@ -334,24 +325,18 @@ class TestPromotionCodes:
 # Webhook event construction
 # ---------------------------------------------------------------
 
-class TestWebhookEvent:
 
+class TestWebhookEvent:
     def test_construct_webhook_event(self, mock_stripe):
         """Happy path — signature is valid."""
-        sc = StripeClient(
-            api_key="sk_test_xxx", webhook_signing_secret="whsec_test"
-        )
+        sc = StripeClient(api_key="sk_test_xxx", webhook_signing_secret="whsec_test")
         expected_event = {"type": "checkout.session.completed"}
         mock_stripe.Webhook.construct_event.return_value = expected_event
 
-        with patch.object(
-            StripeClient, "_get_stripe", return_value=mock_stripe
-        ):
+        with patch.object(StripeClient, "_get_stripe", return_value=mock_stripe):
             result = sc.construct_webhook_event(b"body", "sig_header")
 
-        mock_stripe.Webhook.construct_event.assert_called_once_with(
-            b"body", "sig_header", "whsec_test"
-        )
+        mock_stripe.Webhook.construct_event.assert_called_once_with(b"body", "sig_header", "whsec_test")
         assert result == expected_event
 
     def test_construct_webhook_event_no_secret(self):
@@ -362,16 +347,13 @@ class TestWebhookEvent:
 
     def test_construct_webhook_event_invalid_sig(self, mock_stripe):
         """SDK ``SignatureVerificationError`` is wrapped as ``StripeWebhookError``."""
-        sc = StripeClient(
-            api_key="sk_test_xxx", webhook_signing_secret="whsec_test"
-        )
-        mock_stripe.Webhook.construct_event.side_effect = (
-            mock_stripe.error.SignatureVerificationError("bad sig")
-        )
+        sc = StripeClient(api_key="sk_test_xxx", webhook_signing_secret="whsec_test")
+        mock_stripe.Webhook.construct_event.side_effect = mock_stripe.error.SignatureVerificationError("bad sig")
 
-        with patch.object(
-            StripeClient, "_get_stripe", return_value=mock_stripe
-        ), pytest.raises(StripeWebhookError, match="signature verification"):
+        with (
+            patch.object(StripeClient, "_get_stripe", return_value=mock_stripe),
+            pytest.raises(StripeWebhookError, match="signature verification"),
+        ):
             sc.construct_webhook_event(b"body", "sig_header")
 
 
@@ -379,8 +361,8 @@ class TestWebhookEvent:
 # API error wrapping
 # ---------------------------------------------------------------
 
-class TestApiErrorWrapping:
 
+class TestApiErrorWrapping:
     def test_api_error_wrapping(self, mock_stripe, mock_sdk_client):
         """SDK ``StripeError`` is wrapped as ``StripeApiError``."""
         sc = StripeClient(api_key="sk_test_xxx")

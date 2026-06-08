@@ -32,9 +32,7 @@ class _FakeClient:
         self._event = event
         self._error = error
 
-    def construct_webhook_event(
-        self, payload: bytes | str, sig_header: str
-    ) -> Any:
+    def construct_webhook_event(self, payload: bytes | str, sig_header: str) -> Any:
         if self._error is not None:
             raise self._error
         return self._event
@@ -107,9 +105,7 @@ class TestHandleSyncHandler:
 
         result = await handler.handle(_PAYLOAD, _SIG)
 
-        assert result == WebhookResult(
-            status="ok", event_type="customer.created", event_id="evt_sync"
-        )
+        assert result == WebhookResult(status="ok", event_type="customer.created", event_id="evt_sync")
         assert received_events == [event]
 
 

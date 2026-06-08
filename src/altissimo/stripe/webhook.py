@@ -127,9 +127,7 @@ class StripeWebhookHandler:
         except StripeWebhookError:
             raise
         except Exception as exc:
-            logger.exception(
-                "Handler for %s raised an exception", event_type
-            )
+            logger.exception("Handler for %s raised an exception", event_type)
             return WebhookResult(
                 status="error",
                 event_type=event_type,
