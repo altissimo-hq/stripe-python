@@ -22,6 +22,8 @@ packages = [
 ]
 
 [tool.poetry.group.dev.dependencies]
+pytest-cov = ">=6.0"
+pre-commit = ">=4.0"
 pytest = ">=8.0"
 pytest-asyncio = ">=0.24"
 ruff = ">=0.8"
@@ -34,11 +36,11 @@ asyncio_mode = "auto"
 
 [tool.ruff]
 target-version = "py311"
-line-length = 100
+line-length = 120
 src = ["src", "tests"]
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+select = ["E", "W", "F", "I", "N", "UP", "B", "S", "SIM", "PT", "TCH", "RUF"]
 
 [tool.mypy]
 python_version = "3.11"
@@ -48,3 +50,10 @@ warn_unused_configs = true
 namespace_packages = true
 explicit_package_bases = true
 mypy_path = "src"
+
+[tool.coverage.run]
+source = ["altissimo"]
+omit = ["*/tests/*"]
+
+[tool.coverage.report]
+show_missing = true
