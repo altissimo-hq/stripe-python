@@ -16,6 +16,7 @@ from altissimo.stripe.exceptions import (
     StripeImportError,
     StripeWebhookError,
 )
+from altissimo.stripe.models import StripeShipping
 from altissimo.stripe.pagination import paginate
 
 if TYPE_CHECKING:
@@ -225,9 +226,10 @@ class StripeClient:
         *,
         automatic_payment_methods: dict[str, Any] | None = None,
         description: str | None = None,
-        shipping: dict[str, Any] | None = None,
+        shipping: StripeShipping | dict[str, Any] | None = None,
         metadata: dict[str, str] | None = None,
         receipt_email: str | None = None,
+        **kwargs: Any,
     ) -> Any:
         """Create a PaymentIntent.
 
@@ -239,6 +241,7 @@ class StripeClient:
             shipping: Shipping information.
             metadata: Arbitrary key-value metadata.
             receipt_email: Email to send the receipt to.
+            **kwargs: Extra parameters to pass directly to Stripe's PaymentIntent create endpoint.
         """
         params: dict[str, Any] = {"amount": amount, "currency": currency}
         if automatic_payment_methods is not None:
@@ -246,11 +249,15 @@ class StripeClient:
         if description is not None:
             params["description"] = description
         if shipping is not None:
-            params["shipping"] = shipping
+            if isinstance(shipping, StripeShipping):
+                params["shipping"] = shipping.model_dump(exclude_none=True)
+            else:
+                params["shipping"] = shipping
         if metadata is not None:
             params["metadata"] = metadata
         if receipt_email is not None:
             params["receipt_email"] = receipt_email
+        params.update(kwargs)
         with self._api_call() as client:
             return client.payment_intents.create(params=params)
 

@@ -175,6 +175,46 @@ class TestPaymentIntents:
         )
         assert result is sentinel
 
+    def test_create_payment_intent_with_stripe_shipping_and_kwargs(self, client, mock_sdk_client):
+        from altissimo.stripe import StripeAddress, StripeShipping
+
+        sentinel = object()
+        mock_sdk_client.payment_intents.create.return_value = sentinel
+
+        shipping_info = StripeShipping(
+            name="John Doe",
+            address=StripeAddress(line1="123 Main St", city="Boston", postal_code="02108", country="US"),
+            phone="555-0199",
+        )
+
+        result = client.create_payment_intent(
+            5000,
+            "usd",
+            description="Test charge",
+            shipping=shipping_info,
+            statement_descriptor="DARWINSARK",
+        )
+
+        mock_sdk_client.payment_intents.create.assert_called_once_with(
+            params={
+                "amount": 5000,
+                "currency": "usd",
+                "description": "Test charge",
+                "shipping": {
+                    "name": "John Doe",
+                    "address": {
+                        "line1": "123 Main St",
+                        "city": "Boston",
+                        "postal_code": "02108",
+                        "country": "US",
+                    },
+                    "phone": "555-0199",
+                },
+                "statement_descriptor": "DARWINSARK",
+            },
+        )
+        assert result is sentinel
+
     def test_retrieve_payment_intent(self, client, mock_sdk_client):
         sentinel = object()
         mock_sdk_client.payment_intents.retrieve.return_value = sentinel

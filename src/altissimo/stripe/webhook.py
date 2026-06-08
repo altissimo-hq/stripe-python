@@ -107,7 +107,7 @@ class StripeWebhookHandler:
         """
         # 1. Verify + parse — StripeWebhookError propagates on failure
         event = self._client.construct_webhook_event(payload, sig_header)
-        event_type: str = event.type  # type: ignore[union-attr]
+        event_type: str = event.type
         event_id: str | None = getattr(event, "id", None)
 
         # 2. Look up handler

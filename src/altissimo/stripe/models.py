@@ -34,8 +34,9 @@ class StripeAddress(BaseModel):
 class StripeShipping(BaseModel):
     """Pydantic model for Stripe shipping information."""
 
-    name: str
+    name: str | None = None
     address: StripeAddress
+    phone: str | None = None
 
 
 @dataclass(frozen=True, slots=True)

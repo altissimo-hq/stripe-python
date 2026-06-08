@@ -74,9 +74,14 @@ class TestStripeShipping:
         assert shipping.name == "Jane Doe"
         assert shipping.address.line1 == "123 Main St"
 
-    def test_missing_name_raises(self) -> None:
-        with pytest.raises(Exception):  # noqa: B017
-            StripeShipping(address=StripeAddress())  # type: ignore[call-arg]
+    def test_missing_name_does_not_raise(self) -> None:
+        shipping = StripeShipping(address=StripeAddress())
+        assert shipping.name is None
+
+    def test_phone_field(self) -> None:
+        addr = StripeAddress(line1="123 Main St")
+        shipping = StripeShipping(name="Jane Doe", address=addr, phone="555-0199")
+        assert shipping.phone == "555-0199"
 
     def test_nested_serialization(self) -> None:
         shipping = StripeShipping(
