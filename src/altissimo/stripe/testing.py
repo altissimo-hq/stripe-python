@@ -6,11 +6,13 @@ responses so downstream projects don't need to write their own.
 
 from __future__ import annotations
 
-from collections.abc import Iterator
 from dataclasses import dataclass, field
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from altissimo.stripe.exceptions import StripeWebhookError
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 
 @dataclass

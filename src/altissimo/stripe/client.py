@@ -8,9 +8,8 @@ from __future__ import annotations
 
 import logging
 import os
-from collections.abc import Iterator
 from contextlib import contextmanager
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from altissimo.stripe.exceptions import (
     StripeApiError,
@@ -18,6 +17,9 @@ from altissimo.stripe.exceptions import (
     StripeWebhookError,
 )
 from altissimo.stripe.pagination import paginate
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 logger = logging.getLogger(__name__)
 

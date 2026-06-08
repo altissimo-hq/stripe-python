@@ -9,11 +9,13 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from collections.abc import Callable
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from altissimo.stripe.exceptions import StripeWebhookError
 from altissimo.stripe.models import WebhookResult
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 logger = logging.getLogger(__name__)
 

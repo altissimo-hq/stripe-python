@@ -59,4 +59,4 @@ omit = ["*/tests/*"]
 show_missing = true
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**/*.py" = ["S101", "S105", "S106"]
+"tests/**/*.py" = ["S101", "S105", "S106", "PT011"]
